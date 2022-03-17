@@ -3,6 +3,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Stack;
 
 //Dijkstra algorithm to get shortest path
 public class Dijkstra {
@@ -140,7 +141,7 @@ class Digraph {
     }
 
 	public boolean contains(DirectedEdge e, int v) {
-		for (DirectedEdge tmp : adj(v)) {
+		for (DirectedEdge tmp : adj[v]) {
             if(tmp.equals(e)) {
             	return true;
             }
@@ -185,7 +186,7 @@ class Map {
 	}
 	
 }
-
+//Vertex class used for Priority Queue comparisons
 class Vertex implements Comparable {
 	int s;
 	double dist;
