@@ -1,4 +1,7 @@
 import java.io.File;
+import java.time.LocalTime;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -51,7 +54,7 @@ public class FinalProject {
 				input.next();
 			}
 		}*/
-		option1();
+		option2();
 	}
 	
 	/**
@@ -216,7 +219,85 @@ public class FinalProject {
 		
 	}
 	private static void option2() {
-		
+		Scanner scan = new Scanner(System.in);
+		System.out.println("Enter Arrival Time in 24h format->hh:mm:ss (or enter 'quit' to exit): " );
+		boolean quit=false;
+		//get user input for Arrival Time
+		String time="";
+		while(true) {
+			if (scan.hasNextLine()) {	
+				time =scan.nextLine();
+				//use the java LocalTime library to see if its a valid time
+				try {
+					LocalTime.parse(time);
+					//user input takes hh:mm:ss but file could be h:mm:ss
+					if(time.charAt(0)=='0') {
+						StringBuilder sb = new StringBuilder(time);
+						sb.deleteCharAt(0);
+						time=sb.toString();
+					}
+					break;
+				}
+				catch (DateTimeParseException e) {
+					System.out.println("Error. Enter a VALID Arrival Time in 24h format->hh:mm:ss (or 'quit' to exit): ");
+				}
+			}
+			else if(scan.hasNext(("quit|Quit|q|Q"))){
+				System.out.println("Exitting App.");
+				quit=true;
+				break;
+			}
+		}
+		System.out.println("Getting your Information ready...");
+		if(!quit) {
+			File input = new File("stop_times.txt");
+			
+			//Making a list of all the trips that match the arrival_time
+			List<Trip> list=new ArrayList<Trip>();  
+			try {
+				scan = new Scanner(input);
+				scan.nextLine();
+				while(scan.hasNextLine()) {
+					String in = scan.nextLine();
+					String[] split = in.split(",");
+					if(split[1].replace(" ", "").equals(time)) {
+						Trip t = new Trip();
+						t.tripId=Integer.parseInt(split[0]);
+						t.arrivalTime=split[1];
+						t.departureTime=split[2];
+						t.stopID=Integer.parseInt(split[3]);
+						t.stopSequence=Integer.parseInt(split[4]);
+						if(!split[5].equals("")) {
+							t.stopHeadsign=Integer.parseInt(split[5]);
+						}
+						t.pickupType=Integer.parseInt(split[6]);
+						t.dropOffType=Integer.parseInt(split[7]);
+						if(split.length==9) {
+							t.shapeDistTraveled=Double.parseDouble(split[8]);
+						}
+						list.add(t);
+					}
+				}
+				Collections.sort(list);
+				if(list.isEmpty()) {
+					System.out.println("Sorry no routes macthing input arrival time :( .");
+				}
+				else {
+					System.out.println("Ready :)!!");
+					System.out.println();
+					System.out.println("| Trip ID| Arr Time| Dep Time|StopID|Seq|HS|PU|DO|  SDT  |");
+					System.out.println("|--------|---------|---------|------|---|--|--|--|-------|");
+					for(Trip t:list) {
+						System.out.println(t);
+					}
+				}
+				
+			}
+			catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+	
 	}
 	private static void option3() {
 	
