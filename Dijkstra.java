@@ -90,11 +90,6 @@ class DirectedEdge {
         	return false;
         }
     }
-    @Override
-    public String toString() {
-    	
-    	return v + "->" + w + " " + String.format("%5.2f", weight);
-    }
 }
 
 
