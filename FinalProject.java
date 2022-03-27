@@ -4,10 +4,12 @@ import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
 import java.util.Scanner;
 import java.util.Stack;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedList;
 
 
 public class FinalProject {
@@ -54,7 +56,7 @@ public class FinalProject {
 				input.next();
 			}
 		}*/
-		option2();
+		option3();
 	}
 	
 	/**
@@ -73,7 +75,6 @@ public class FinalProject {
 				String[] split = in.split(",");
 				map.addStop(Integer.parseInt(split[0]));
 			}
-			System.out.println(map.getStopID(8756));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -230,7 +231,7 @@ public class FinalProject {
 				//use the java LocalTime library to see if its a valid time
 				try {
 					LocalTime.parse(time);
-					//user input takes hh:mm:ss but file could be h:mm:ss
+					//user input is required as hh:mm:ss but file could be h:mm:ss
 					if(time.charAt(0)=='0') {
 						StringBuilder sb = new StringBuilder(time);
 						sb.deleteCharAt(0);
@@ -300,7 +301,54 @@ public class FinalProject {
 	
 	}
 	private static void option3() {
-	
+		Scanner scan;
+		File input = new File("stops.txt");
+		try {
+			scan = new Scanner(input);
+			List<String> list=new ArrayList<>();
+			list.add(scan.nextLine());
+			ArrayList<String> tmp = null;
+			TST t = new TST();
+			while(scan.hasNextLine()) {
+				String in = scan.nextLine();
+				list.add(in);
+				String[] temp = in.split(",");
+				String[] split=temp[2].split(" ");
+				tmp = new ArrayList(Arrays.asList(split));
+				if(split[0].equals("NB") ||split[0].equals("SB") ||
+	               split[0].equals("WB") || split[0].equals("EB") ||
+	               split[0].equals("FLAGSTOP")) {
+					String keyword = tmp.remove(0);
+					tmp.add(keyword);
+					StringBuilder builder = new StringBuilder();
+					int i=0;
+					for (String value : tmp) {
+					    builder.append(value);
+					    i++;
+					    if(i!=tmp.size())
+					    	builder.append(" ");
+					}
+					temp[2]=builder.toString();
+				}
+				t.put(temp[2],t.size()+1);
+				//list.add(temp[2]);
+			}
+			//System.out.println(list.get(0));
+			
+			//We can use keyWithPrefix() function as the valid input is only
+			//full name or first few chars
+			LinkedList<String> matching = (LinkedList<String>) t.keysWithPrefix("HAS");
+		
+			for(String s : matching) {
+					
+				System.out.println(list.get((int) t.get(s)));
+			}
+			//System.out.println(matching.size()+" "+list.size());
+			System.out.println(list.get(10));
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 }
