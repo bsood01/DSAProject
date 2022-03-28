@@ -15,7 +15,7 @@ import java.util.LinkedList;
 public class FinalProject {
 
 	public static void main(String[] args) {
-		/*System.out.println("Welcome To the Bus Management System!!");
+		System.out.println("Welcome To the Bus Management System!!");
 		Scanner input = new Scanner(System.in);
 		String[] tmp = {"find a shortest path", "search for a bus stop",
 				"search for all trips given an arrival time"};
@@ -55,14 +55,14 @@ public class FinalProject {
 					+ "to select from options above (or 'quit' to exit): ");
 				input.next();
 			}
-		}*/
-		option3();
+		}
 	}
 	
 	/**
 	 * Method for finding shortest path
 	 */
 	private static void option1() {
+		System.out.println("Preparing Graph...");
 		Scanner scan;
 		File input = new File("stops.txt");
 		Map map = new Map();
@@ -114,10 +114,6 @@ public class FinalProject {
 				}
 				
 			}
-			for(DirectedEdge e:graph.edges() ) {
-				System.out.println(e.toString());
-			}
-			System.out.println(graph.E());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -148,10 +144,6 @@ public class FinalProject {
 					graph.addEdge(e);
 				}
 			}
-			for(DirectedEdge e:graph.edges() ) {
-				System.out.println(e.toString());
-			}
-			System.out.println(graph.E());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -202,31 +194,99 @@ public class FinalProject {
 				for(DirectedEdge e = edgeTo[map.getIndex(stop2ID)]; e != null; e = edgeTo[e.from()]) {
 					path = map.getStopID(e.from())+"->"+path;
 				}
-				System.out.println(path+" "+distTo[map.getIndex(stop2ID)]);
+				System.out.println("Path: "+path);
+				System.out.println("Associated Cost: "+distTo[map.getIndex(stop2ID)]);
 				
 			}
 			else {
 				System.out.printf("No path exists between %d and %d",stop1ID,stop2ID);
 			}
-			
-			/*double min=Integer.MAX_VALUE;
-			for(int i=0;i<distTo.length;i++) {
-				if(distTo[i]<min) {
-					min=distTo[i];
-				}
-			}
-			System.out.println(min);*/
 		}
 		
 	}
 	private static void option2() {
+		Scanner scan;
+		File input = new File("stops.txt");
+		try {
+			scan = new Scanner(input);
+			List<String> list=new ArrayList<>();
+			list.add(scan.nextLine());
+			ArrayList<String> tmp = null;
+			TST t = new TST();
+			int lineIndex=1;
+			while(scan.hasNextLine()) {
+				String in = scan.nextLine();
+				list.add(in);
+				String[] temp = in.split(",");
+				String[] split=temp[2].split(" ");
+				tmp = new ArrayList(Arrays.asList(split));
+				while(tmp.get(0).equals("NB") ||tmp.get(0).equals("SB") ||
+						tmp.get(0).equals("WB") || tmp.get(0).equals("EB") ||
+						tmp.get(0).equals("FLAGSTOP")) {
+					String keyword = tmp.remove(0);
+					tmp.add(keyword);
+					StringBuilder builder = new StringBuilder();
+					int i=0;
+					for (String value : tmp) {
+					    builder.append(value);
+					    i++;
+					    if(i!=tmp.size())
+					    	builder.append(" ");
+					}
+					temp[2]=builder.toString();
+				}
+				t.put(temp[2],lineIndex);
+				lineIndex++;
+			}
+			
+			
+			//We can use keyWithPrefix() function as the valid input is only
+			//full name or first few chars
+			System.out.println("Enter the full Stop Name or it's first few letters. (or 'quit' to exit)-");
+			boolean quit=false;
+			//get user input for StopName
+			String stopName="";
+			scan = new Scanner(System.in);
+			while(true) {
+				if(scan.hasNext(("quit|Quit|q|Q"))){
+					System.out.println("Exitting App.");
+					quit=true;
+					break;
+				}
+					
+				stopName =scan.nextLine();
+				LinkedList<String> matching = (LinkedList<String>) t.keysWithPrefix(stopName.toUpperCase());
+				if(matching.size()!=0) {
+					System.out.println("Info of stops with matching criteria:\n");
+					System.out.println(list.get(0));
+					for(String s : matching) {
+						System.out.println(list.get((int) t.get(s)));
+					}
+					break;
+				}
+				else {
+					System.out.println("Error. No matched found, enter a correct Stop Name (or 'quit' to exit): ");
+				}
+			}
+			
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	private static void option3() {
 		Scanner scan = new Scanner(System.in);
 		System.out.println("Enter Arrival Time in 24h format->hh:mm:ss (or enter 'quit' to exit): " );
 		boolean quit=false;
 		//get user input for Arrival Time
 		String time="";
 		while(true) {
-			if (scan.hasNextLine()) {	
+			if(scan.hasNext(("quit|Quit|q|Q"))){
+				System.out.println("Exitting App.");
+				quit=true;
+				break;
+			}
+		
+			else if (scan.hasNextLine()) {	
 				time =scan.nextLine();
 				//use the java LocalTime library to see if its a valid time
 				try {
@@ -243,14 +303,10 @@ public class FinalProject {
 					System.out.println("Error. Enter a VALID Arrival Time in 24h format->hh:mm:ss (or 'quit' to exit): ");
 				}
 			}
-			else if(scan.hasNext(("quit|Quit|q|Q"))){
-				System.out.println("Exitting App.");
-				quit=true;
-				break;
-			}
 		}
-		System.out.println("Getting your Information ready...");
+		
 		if(!quit) {
+			System.out.println("Getting your Information ready...");
 			File input = new File("stop_times.txt");
 			
 			//Making a list of all the trips that match the arrival_time
@@ -300,55 +356,6 @@ public class FinalProject {
 		}
 	
 	}
-	private static void option3() {
-		Scanner scan;
-		File input = new File("stops.txt");
-		try {
-			scan = new Scanner(input);
-			List<String> list=new ArrayList<>();
-			list.add(scan.nextLine());
-			ArrayList<String> tmp = null;
-			TST t = new TST();
-			while(scan.hasNextLine()) {
-				String in = scan.nextLine();
-				list.add(in);
-				String[] temp = in.split(",");
-				String[] split=temp[2].split(" ");
-				tmp = new ArrayList(Arrays.asList(split));
-				if(split[0].equals("NB") ||split[0].equals("SB") ||
-	               split[0].equals("WB") || split[0].equals("EB") ||
-	               split[0].equals("FLAGSTOP")) {
-					String keyword = tmp.remove(0);
-					tmp.add(keyword);
-					StringBuilder builder = new StringBuilder();
-					int i=0;
-					for (String value : tmp) {
-					    builder.append(value);
-					    i++;
-					    if(i!=tmp.size())
-					    	builder.append(" ");
-					}
-					temp[2]=builder.toString();
-				}
-				t.put(temp[2],t.size()+1);
-				//list.add(temp[2]);
-			}
-			//System.out.println(list.get(0));
-			
-			//We can use keyWithPrefix() function as the valid input is only
-			//full name or first few chars
-			LinkedList<String> matching = (LinkedList<String>) t.keysWithPrefix("HAS");
-		
-			for(String s : matching) {
-					
-				System.out.println(list.get((int) t.get(s)));
-			}
-			//System.out.println(matching.size()+" "+list.size());
-			System.out.println(list.get(10));
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+	
 
 }
